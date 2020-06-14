@@ -20,6 +20,13 @@ type Tournament struct {
 	regulation string
 }
 
+type Player struct {
+	ID      int
+	name    string
+	twitter string
+	blog    string
+}
+
 func createTable(db *sql.DB) error {
 	q := `
 	CREATE TABLE tournament (
@@ -28,25 +35,53 @@ func createTable(db *sql.DB) error {
 		regulation VARCHAR(255)
 	);
 	`
+	// if _, err := db.Exec(q); err != nil {
+	// 	// log.Fatal(err)
+	// 	return err
+	// }
+
+	q = `
+	CREATE TABLE Player (
+		ID INTEGER PRIMARY KEY AUTOINCREMENT,
+		name VARCHAR(255),
+		twitter VARCHAR(255),
+		blog VARCHAR(255)
+	);
+	`
 	if _, err := db.Exec(q); err != nil {
 		// log.Fatal(err)
 		return err
 	}
 	return nil
+
 }
 
 func insertData(db *sql.DB) {
 	// 大会の初期データ
-	q := "INSERT into tournament (name, regulation) values (?, ?)"
-	insertTournamentData(q, db, "CLAichi", "standard")
-	insertTournamentData(q, db, "CLMiyagi", "standard")
-	insertTournamentData(q, db, "CLKyouto", "extra")
+	// q := "INSERT into tournament (name, regulation) values (?, ?)"
+	// insertTournamentData(q, db, "CLAichi", "standard")
+	// insertTournamentData(q, db, "CLMiyagi", "standard")
+	// insertTournamentData(q, db, "CLKyouto", "extra")
 
 	// デッキの初期データ
+
+	// 使用者の初期データ
+	q := "INSERT into player (name, twitter, blog) values (?, ?, ?)"
+	insertPlayerData(q, db, "satou", "@satoupoke", "www.note.com")
+	insertPlayerData(q, db, "tanaka", "@tanakapoke", "www.note.com")
+	insertPlayerData(q, db, "gotou", "@gotoupoke", "www.ameblg.com")
+
 }
 
 func insertTournamentData(query string, db *sql.DB, name string, regulation string) {
 	_, err := db.Exec(query, name, regulation)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func insertPlayerData(query string, db *sql.DB, name string, twitter string, blog string) {
+	_, err := db.Exec(query, name, twitter, blog)
 	if err != nil {
 		log.Fatal(err)
 	}
