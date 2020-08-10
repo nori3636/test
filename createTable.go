@@ -6,15 +6,17 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
 // データ格納用
 
 // 大会テーブル格納用
 type Tournament struct {
-	TID        int
-	Tname      string
-	regulation string
-	league     string
-	HPlink     string
+	TID          int
+	Tname        string
+	Abbreviation string
+	regulation   string
+	league       string
+	HPlink       string
 }
 
 //デッキテーブル格納用
@@ -22,7 +24,6 @@ type Deck struct {
 	TID      int
 	Rank     int
 	DID      int
-	PID      int
 	DeckCode string
 	blog     string
 }
@@ -30,14 +31,9 @@ type Deck struct {
 //デッキタイプ格納
 type Deckname struct {
 	DID      int
+	Dtype    string
 	Japanese string
 	English  string
-}
-
-type Player struct {
-	PID     int
-	name    string
-	Twitter string
 }
 
 type Rule struct {
@@ -46,39 +42,50 @@ type Rule struct {
 }
 
 func createTable(db *sql.DB) error {
+	//大会テーブル作成
 	// q := `
 	// CREATE TABLE tournament (
 	// 	TID INTEGER PRIMARY KEY AUTOINCREMENT,
 	// 	Tname VARCHAR(255),
+	// 	Abbreviation VARCHAR(255),
 	// 	regulation VARCHAR(255),
 	// 	league VARCHAR(255),
 	// 	HPlink VARCHAR(255),
 	// 	FOREIGN KEY(regulation, league) REFERENCES Rule(regulation, league)
 	// );
 	// `
-	// q = `
+	//デッキテーブル作成
+	// q := `
 	// CREATE TABLE deck (
 	// 	TID INTEGER,
 	// 	Rank INTEGER,
 	// 	DID INTEGER,
-	// 	PID INTEGER,
 	// 	Deckcode VARCHAR(255),
 	// 	blog VARCHAR(255),
-	// 	FOREIGN KEY(TID) REFERENCES Tournament(TID),
-	//	FOREIGN KEY(PID) REFERENCES Player(PID),
+	// 	FOREIGN KEY(TID) REFERENCES Tournament(TID)
 	// );
 	// `
+	//デッキ名テーブル作成
+	q := `
+	CREATE TABLE deckname (
+		TID INTEGER,
+		japanese VARCHAR(255),
+		english VARCHAR(255),
+		decktype VARCHAR(255),
+		FOREIGN KEY(TID) REFERENCES Tournament(TID)
+	);
+	 `
 	// if _, err := db.Exec(q); err != nil {
 	// 	// log.Fatal(err)
 	// 	return err
 	// }
 
-	q := `
-	CREATE TABLE rule (
-		regulation VARCHAR(255),
-		league VARCHAR(255)
-	);
-	`
+	// q := `
+	// CREATE TABLE rule (
+	// 	regulation VARCHAR(255),
+	// 	league VARCHAR(255)
+	// );
+	// `
 	if _, err := db.Exec(q); err != nil {
 		// log.Fatal(err)
 		return err
@@ -88,17 +95,16 @@ func createTable(db *sql.DB) error {
 }
 
 func insertData(db *sql.DB) {
-	// 大会の初期データ
-	// q := "INSERT into tournament (name, regulation) values (?, ?)"
-	// insertTournamentData(q, db, "CLAichi", "standard")
-	// insertTournamentData(q, db, "CLMiyagi", "standard")
-	// insertTournamentData(q, db, "CLKyouto", "extra")
+	// 大会のデータ
+	// q := "INSERT into tournament (Tname, Abbreviation, regulation, league, HPlink) values (?, ?, ?, ?, ?)"
+	// insertTournamentData(q, db, "ポケモンジャパンナショナルオンライン2020","PJNO","standard", "open", "https://pjnonline.net/")
+	// insertTournamentData(q, db, "リザードンHR争奪戦", "シールド戦", "Special", "open", "https://www.pokemon-card.com/info/2020/20200703_002471.html")
 	// 大会ルールの初期データ
 	q := "INSERT into rule (regulation, league) values (?, ?)"
-	insertRuleData(q, db, "stan", "open")
-	// insertRuleData(q, db, "エクストラ", "マスター")
-	// insertRuleData(q, db, "殿堂", "シニア")
-	// insertRuleData(q, db, "特殊ルール", "ジュニア")
+	insertRuleData(q, db, "standard", "open")
+	insertRuleData(q, db, "Expanded", "master")
+	insertRuleData(q, db, "HoF", "Senior")
+	insertRuleData(q, db, "Special", "Junior")
 
 }
 
