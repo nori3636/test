@@ -15,6 +15,29 @@ const dbPath = "./test.DB"
 var DbConnection *sql.DB
 
 func main() {
+
+	// f, err := os.Open("PJNO.csv")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// r := csv.NewReader(f)
+
+	// for i := 0; i < 5; i++ {
+	// 	record, err := r.Read()
+	// 	if err == io.EOF {
+	// 		break
+	// 	}
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	slice := strings.Split(f, ",")
+	// 	for _, x := range slice {
+	// 		fmt.Println(x)
+	// 	}
+
+	// }
+
 	// Open(driver,  sql 名(任意の名前))
 	DbConnection, _ := sql.Open("sqlite3", dbPath)
 
